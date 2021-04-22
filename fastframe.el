@@ -56,7 +56,8 @@ again in a timer. If `fastframe--to-remove' in non-nil, first
 remove a random frame that doesn't match
 `fastframe--last-parameters'."
   (when (memq window-system '(x w32 ns))
-    (when fastframe--to-remove
+    (when (and fastframe--to-remove
+               (=> fastframe--pool-current-count fastframe-pool-size))
       (let* ((keep (assoc fastframe--last-parameters fastframe--pool))
              (rand (random
                     (- fastframe--pool-current-count (length (cdr keep)))))
@@ -76,8 +77,8 @@ remove a random frame that doesn't match
                             (pop (cdar tail)))))
                      (setq rand (- rand len))))))
           (setq tail
-                (cdr tail))))
-      (setq fastframe--to-remove nil))
+                (cdr tail)))))
+    (setq fastframe--to-remove nil)
     (when (< fastframe--pool-current-count fastframe-pool-size)
       (let* ((params fastframe--last-parameters)
              (frame (x-create-frame-with-faces
