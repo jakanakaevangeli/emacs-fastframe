@@ -109,7 +109,8 @@ cdr of ASSOC."
 (defun fastframe--remove-random-from-pool (assoc)
   "Remove a random frame from the pool.
 Do nothing and return nil if it corresponds to ASSOC from
-`frame--pool'. Otherwise remove it and return t."
+`frame--pool'. Otherwise remove it, return t and lower
+`fastframe--pool-current-count'."
   (let* ((rand (random fastframe--pool-current-count))
          (tail fastframe--pool)
          (deleted nil))
@@ -132,8 +133,8 @@ Do nothing and return nil if it corresponds to ASSOC from
     deleted))
 
 (defun fastframe--add-frame-to-assoc (assoc)
-  "Add a frame to cdr of ASSOC.
-car of ASSOC specifies the frames parameters. Increase
+  "Create a frame and add it to cdr of ASSOC.
+car of ASSOC specifies the frame's parameters. Increase
 `fastframe--pool-current-count'."
   (when (memq window-system '(x w32 ns))
     (let* ((frame (x-create-frame-with-faces
