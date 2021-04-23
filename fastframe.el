@@ -132,17 +132,16 @@ Do nothing and return nil if it corresponds to ASSOC from
     deleted))
 
 (defun fastframe--add-frame-to-assoc (assoc)
-  "Add a frame with to cdr of ASSOC.
+  "Add a frame to cdr of ASSOC.
 car of ASSOC specifies the frames parameters. Increase
 `fastframe--pool-current-count'."
   (when (memq window-system '(x w32 ns))
-    (when (< fastframe--pool-current-count fastframe-pool-size)
-      (let* ((frame (x-create-frame-with-faces
-                     (cons '(visibility . nil) (car assoc)))))
-        (let ((inhibit-quit t))
-          (push frame (cdr assoc))
-          (setq fastframe--pool-current-count
-                (1+ fastframe--pool-current-count)))))))
+    (let* ((frame (x-create-frame-with-faces
+                   (cons '(visibility . nil) (car assoc)))))
+      (let ((inhibit-quit t))
+        (push frame (cdr assoc))
+        (setq fastframe--pool-current-count
+              (1+ fastframe--pool-current-count))))))
 
 ;;;###autoload
 (defun fastframe-activate ()
