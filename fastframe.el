@@ -44,32 +44,35 @@ PARAMETERS."
               (make-frame-visible frame)))
       (setq as (list parameters))
       (push as fastframe--pool))
-    (unless frame
-      (setq frame (x-create-frame-with-faces parameters)))
+    (prog1 (or frame (x-create-frame-with-faces parameters))
+      (fastframe--setup-timer as))))
 
-    (when-let* ((timer fastframe--timer))
-      (cancel-timer timer))
-    (let ((timer))
-      (setq
-       timer
-       (run-with-idle-timer
-        fastframe-idle-time t
-        (lambda ()
-          (while
-              (and
-               (eq timer fastframe--timer)
-               (progn
-                 (if (< fastframe--pool-current-count
-                        fastframe-pool-size)
-                     (prog1 t
-                       (fastframe--add-frame-to-assoc as))
-                   (when (fastframe--remove-random-from-pool as)
-                     (fastframe--add-frame-to-assoc as))
-                   (cancel-timer timer)
-                   (setq fastframe--timer nil)))
-               (sit-for fastframe-idle-time))))))
-      (setq fastframe--timer timer))
-    frame))
+(defun fastframe--setup-timer (assoc)
+  "Set up a timer to start making frames for the pool.
+Use frame parameters specified in car of ASSOC and add frames to
+cdr of ASSOC."
+  (when-let* ((timer fastframe--timer))
+    (cancel-timer timer))
+  (let ((timer))
+    (setq
+     timer
+     (run-with-idle-timer
+      fastframe-idle-time t
+      (lambda ()
+        (while
+            (and
+             (eq timer fastframe--timer)
+             (progn
+               (if (< fastframe--pool-current-count
+                      fastframe-pool-size)
+                   (prog1 t
+                     (fastframe--add-frame-to-assoc assoc))
+                 (when (fastframe--remove-random-from-pool assoc)
+                   (fastframe--add-frame-to-assoc assoc))
+                 (cancel-timer timer)
+                 (setq fastframe--timer nil)))
+             (sit-for fastframe-idle-time))))))
+    (setq fastframe--timer timer)))
 
 (defun fastframe--remove-random-from-pool (assoc)
   "Remove a random frame from the pool.
