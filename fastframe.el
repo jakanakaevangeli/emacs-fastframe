@@ -89,7 +89,7 @@ PARAMETERS."
     (dolist (param parameters)
       (let ((param-name (car param)))
         (when (memq param-name static-params)
-          (push stripped-params param))
+          (push param stripped-params))
         (cond ((eq param-name 'visibility)
                (setq specified-visibility t))
               ((eq param-name 'no-other-frame)
