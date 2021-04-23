@@ -51,6 +51,14 @@ than `fastframe-pool-size', start create new frames after this
 amount of idle time."
   :type 'number)
 
+(defvar fastframe-static-parameters
+  '(display display-type name minibuffer window-id outer-window-id
+            font-backend)
+  "List of frame parameters that cannot be changed.
+Fastframe will not try to change these parameters of frames in
+the pool. It will instead choose a frame that was created with
+these parameters if it exist.")
+
 (defvar fastframe--pool nil
   "Alist of invisible frames.
 Cars are frame parameters and cdrs are lists of invisible
@@ -66,26 +74,35 @@ frames.")
 Like `x-create-frame-with-faces', but tries to reuse existing
 invisible frames from `fastframe--pool' with matching
 PARAMETERS."
-  (let ((as (assoc parameters fastframe--pool))
-        (frame nil))
-    (if as
+  (let* ((static-params fastframe-static-parameters)
+         stripped-params as frame visibility-in-params)
+    (dolist (p parameters)
+      (when (memq (car p) static-params)
+        (push stripped-params p))
+      (when (eq (car p) 'visibility)
+        (setq visibility-in-params t)))
+
+    (if (setq as (assoc stripped-params fastframe--pool))
         (while (and (null frame) (cadr as))
           (let ((inhibit-quit t))
             (setq frame (pop (cdr as)))
             (setq fastframe--pool-current-count
                   (1- fastframe--pool-current-count)))
           (if (frame-live-p frame)
-              (make-frame-visible frame)
+              (modify-frame-parameters
+               frame
+               (if visibility-in-params
+                   parameters
+                 (cons '(visibility . t) parameters)))
             (setq frame nil)))
-      (setq as (list parameters))
+      (setq as (list stripped-params))
       (push as fastframe--pool))
     (prog1 (or frame (x-create-frame-with-faces parameters))
-      (fastframe--setup-timer as))))
+      (fastframe--setup-timer as parameters))))
 
-(defun fastframe--setup-timer (assoc)
+(defun fastframe--setup-timer (assoc params)
   "Set up a timer to start making frames for the pool.
-Use frame parameters specified in car of ASSOC and add frames to
-cdr of ASSOC."
+Use frame parameters PARAMS and add frames to cdr of ASSOC."
   (let ((timer fastframe--timer))
     (when timer (cancel-timer timer))
     (setq
@@ -98,9 +115,9 @@ cdr of ASSOC."
              (eq timer fastframe--timer)
              (if (< fastframe--pool-current-count fastframe-pool-size)
                  (prog1 t
-                   (fastframe--add-frame-to-assoc assoc))
+                   (fastframe--add-frame-to-assoc assoc params))
                (when (fastframe--remove-random-from-pool assoc)
-                 (fastframe--add-frame-to-assoc assoc))
+                 (fastframe--add-frame-to-assoc assoc params))
                (cancel-timer timer)
                (setq fastframe--timer nil))
              (sit-for fastframe-idle-time))))))
@@ -132,13 +149,13 @@ Do nothing and return nil if it corresponds to ASSOC from
       (setq tail (cdr tail)))
     deleted))
 
-(defun fastframe--add-frame-to-assoc (assoc)
-  "Create a frame and add it to cdr of ASSOC.
-car of ASSOC specifies the frame's parameters. Increase
+(defun fastframe--add-frame-to-assoc (assoc params)
+  "Create an invisible frame and add it to cdr of ASSOC.
+Use PARAMS as the frame's parameters. Increase
 `fastframe--pool-current-count'."
   (when (memq window-system '(x w32 ns))
     (let* ((frame (x-create-frame-with-faces
-                   (cons '(visibility . nil) (car assoc)))))
+                   (cons '(visibility . nil) params))))
       (let ((inhibit-quit t))
         (push frame (cdr assoc))
         (setq fastframe--pool-current-count
