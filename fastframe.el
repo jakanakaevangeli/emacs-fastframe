@@ -6,7 +6,7 @@
   :prefix "fastframe-"
   :link '(url-link "https://github.com/jakanakaevan/fastframe.el"))
 
-(defcustom fastframe-pool-size 10
+(defcustom fastframe-pool-size 15
   "Maximum number of invisible frames to keep in the pool."
   :type 'integer)
 
