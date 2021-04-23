@@ -96,15 +96,13 @@ cdr of ASSOC."
         (while
             (and
              (eq timer fastframe--timer)
-             (progn
-               (if (< fastframe--pool-current-count
-                      fastframe-pool-size)
-                   (prog1 t
-                     (fastframe--add-frame-to-assoc assoc))
-                 (when (fastframe--remove-random-from-pool assoc)
+             (if (< fastframe--pool-current-count fastframe-pool-size)
+                 (prog1 t
                    (fastframe--add-frame-to-assoc assoc))
-                 (cancel-timer timer)
-                 (setq fastframe--timer nil)))
+               (when (fastframe--remove-random-from-pool assoc)
+                 (fastframe--add-frame-to-assoc assoc))
+               (cancel-timer timer)
+               (setq fastframe--timer nil))
              (sit-for fastframe-idle-time))))))
     (setq fastframe--timer timer)))
 
