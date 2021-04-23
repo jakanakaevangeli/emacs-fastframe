@@ -174,7 +174,7 @@ Use PARAMS as the frame's parameters. Increase
   (with-eval-after-load 'w32-win
     (cl-defmethod frame-creation-function (params &context (window-system w32))
       (fastframe-x-create-frame-with-faces params)))
-  (with-eval-after-load 'w32-win
+  (with-eval-after-load 'ns-win
     (cl-defmethod frame-creation-function (params &context (window-system ns))
       (fastframe-x-create-frame-with-faces params))))
 
