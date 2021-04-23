@@ -122,8 +122,6 @@ car of ASSOC specifies the frames parameters. Increase
       (fastframe-x-create-frame-with-faces params)))
   (with-eval-after-load 'w32-win
     (cl-defmethod frame-creation-function (params &context (window-system ns))
-      (fastframe-x-create-frame-with-faces params)))
-  (run-with-idle-timer fastframe-idle-time t
-                       #'fastframe--timer-function))
+      (fastframe-x-create-frame-with-faces params))))
 
 (provide 'fastframe)
