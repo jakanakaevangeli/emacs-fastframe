@@ -1,4 +1,4 @@
-This is a simple tool to mitigate make-frame performance issues.
+A simple tool to mitigate make-frame performance issues.
 
 Graphical frame creation can get very slow when a lot of faces are defined.
 Fastframe can help mitigate this by creating a pool of invisible frames

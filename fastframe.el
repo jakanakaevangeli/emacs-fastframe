@@ -6,7 +6,7 @@
 ;; Created: 2021-04-23
 ;; Version: 1.0
 ;; Keywords: frames
-;; URL: https://github.com/jakanakaevan/emacs-fastframe
+;; URL: https://github.com/jakanakaevangeli/emacs-fastframe
 
 ;; This file is not part of GNU Emacs.
 
@@ -25,7 +25,7 @@
 
 ;;; Commentary:
 
-;; This is a simple tool to mitigate make-frame performance issues.
+;; A simple tool to mitigate make-frame performance issues.
 ;;
 ;; Graphical frame creation can get very slow when a lot of faces are defined.
 ;; Fastframe can help mitigate this by creating a pool of invisible frames
@@ -46,7 +46,7 @@
   "Mitigate frame creation performance."
   :group 'frames
   :prefix "fastframe-"
-  :link '(url-link "https://github.com/jakanakaevan/emacs-fastframe"))
+  :link '(url-link "https://github.com/jakanakaevangeli/emacs-fastframe"))
 
 (defcustom fastframe-pool-size 15
   "Maximum number of invisible frames to keep in the pool."
@@ -55,7 +55,7 @@
 (defcustom fastframe-idle-time 2
   "Time in seconds to wait before we start filling frame pool.
 If the number of invisible frames in the frame pool is smaller
-than `fastframe-pool-size', start create new frames after this
+than `fastframe-pool-size', start creating new frames after this
 amount of idle time."
   :type 'number)
 
@@ -69,8 +69,9 @@ these parameters if it exist.")
 
 (defvar fastframe--pool nil
   "Alist of invisible frames.
-Cars are frame parameters and cdrs are lists of invisible
-frames.")
+Cars are frame parameters and cdrs are lists of invisible frames.
+Only frame parameters from `fastframe-static-parameters' are used
+for the cars.")
 
 (defvar fastframe--pool-current-count 0
   "Number of invisible frames in `fastframe--pool'.")
