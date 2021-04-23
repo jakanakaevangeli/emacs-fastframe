@@ -51,9 +51,8 @@ PARAMETERS."
   "Set up a timer to start making frames for the pool.
 Use frame parameters specified in car of ASSOC and add frames to
 cdr of ASSOC."
-  (when-let* ((timer fastframe--timer))
-    (cancel-timer timer))
-  (let ((timer))
+  (let ((timer fastframe--timer))
+    (when timer (cancel-timer timer))
     (setq
      timer
      (run-with-idle-timer
