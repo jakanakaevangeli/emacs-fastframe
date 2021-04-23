@@ -25,12 +25,20 @@
 
 ;;; Commentary:
 
-;; This is a tiny tool to mitigate make-frame performance issues.
+;; This is a simple tool to mitigate make-frame performance issues.
 ;;
 ;; Graphical frame creation can get very slow when a lot of faces are defined.
 ;; Fastframe can help mitigate this by creating a pool of invisible frames
 ;; during idle time. When a frame is requested with `frame-creation-function',
 ;; a pre-made frame will be made visible from the pool and returned.
+;;
+;; Installation:
+;;
+;; Add the following to you Emacs init file:
+;;
+;;  (add-to-list 'load-path "/path/to/emacs-fastframe/")
+;;  (require 'fastframe)
+;;  (fastframe-activate)
 
 ;;; Code:
 
