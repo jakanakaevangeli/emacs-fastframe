@@ -84,10 +84,16 @@ Like `x-create-frame-with-faces', but tries to reuse existing
 invisible frames from `fastframe--pool' with matching
 PARAMETERS."
   (let* ((static-params fastframe-static-parameters)
-         stripped-params as frame)
-    (dolist (p parameters)
-      (when (memq (car p) static-params)
-        (push stripped-params p)))
+         stripped-params as frame
+         specified-visibility specified-no-other-frame)
+    (dolist (param parameters)
+      (let ((param-name (car param)))
+        (when (memq param-name static-params)
+          (push stripped-params param))
+        (cond ((eq param-name 'visibility)
+               (setq specified-visibility t))
+              ((eq param-name 'no-other-frame)
+               (setq specified-no-other-frame t)))))
 
     (if (setq as (assoc stripped-params fastframe--pool))
         (while (and (null frame) (cadr as))
@@ -96,9 +102,12 @@ PARAMETERS."
             (setq fastframe--pool-current-count
                   (1- fastframe--pool-current-count)))
           (if (frame-live-p frame)
-              (modify-frame-parameters
-               frame
-               (append parameters '((no-other-frame . nil) (visibility . t))))
+              (progn
+                (unless specified-visibility
+                  (setq parameters (cons '(visibility . t) parameters)))
+                (unless specified-no-other-frame
+                  (setq parameters (cons '(no-other-frame . nil) parameters)))
+                (modify-frame-parameters frame parameters))
             (setq frame nil)))
       (setq as (list stripped-params))
       (push as fastframe--pool))
