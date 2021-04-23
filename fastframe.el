@@ -1,10 +1,44 @@
-;; -*- lexical-binding: t; -*-
+;;; fastframe.el --- Mitigate frame creation performance. -*- lexical-binding: t; -*-
+
+;; Filename: fastframe.el
+;; Description: Mitigate frame creation performance.
+;; Author: jakanakaevangeli <jakanakaevangeli@chiru.no>
+;; Created: 2021-04-23
+;; Version: 1.0
+;; Keywords: frames
+;; URL: https://github.com/jakanakaevan/emacs-fastframe
+
+;; This file is not part of GNU Emacs.
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; This is a tiny tool to mitigate make-frame performance issues.
+;;
+;; Graphical frame creation can get very slow when a lot of faces are defined.
+;; Fastframe can help mitigate this by creating a pool of invisible frames
+;; during idle time. When a frame is requested with `frame-creation-function',
+;; a pre-made frame will be made visible from the pool and returned.
+
+;;; Code:
 
 (defgroup fastframe nil
-  "Faster make-frame using a pool invisible pre-made frames."
+  "Mitigate frame creation performance."
   :group 'frames
   :prefix "fastframe-"
-  :link '(url-link "https://github.com/jakanakaevan/fastframe.el"))
+  :link '(url-link "https://github.com/jakanakaevan/emacs-fastframe"))
 
 (defcustom fastframe-pool-size 15
   "Maximum number of invisible frames to keep in the pool."
@@ -113,6 +147,7 @@ car of ASSOC specifies the frames parameters. Increase
 
 ;;;###autoload
 (defun fastframe-activate ()
+  "Activate fastframe."
   (with-eval-after-load 'x-win
     (cl-defmethod frame-creation-function (params &context (window-system x))
       (fastframe-x-create-frame-with-faces params)))
@@ -124,3 +159,4 @@ car of ASSOC specifies the frames parameters. Increase
       (fastframe-x-create-frame-with-faces params))))
 
 (provide 'fastframe)
+;;; fastframe.el ends here
