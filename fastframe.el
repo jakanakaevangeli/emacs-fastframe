@@ -69,13 +69,14 @@ PARAMETERS."
   (let ((as (assoc parameters fastframe--pool))
         (frame nil))
     (if as
-        (if (setq frame (cadr as))
-            (progn
-              (let ((inhibit-quit t))
-                (pop (cdr as))
-                (setq fastframe--pool-current-count
-                      (1- fastframe--pool-current-count)))
-              (make-frame-visible frame)))
+        (while (and (null frame) (cadr as))
+          (let ((inhibit-quit t))
+            (setq frame (pop (cdr as)))
+            (setq fastframe--pool-current-count
+                  (1- fastframe--pool-current-count)))
+          (if (frame-live-p frame)
+              (make-frame-visible frame)
+            (setq frame nil)))
       (setq as (list parameters))
       (push as fastframe--pool))
     (prog1 (or frame (x-create-frame-with-faces parameters))
