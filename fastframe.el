@@ -36,7 +36,7 @@
 ;;
 ;; Add the following to you Emacs init file:
 ;;
-;;  (add-to-list 'load-path "/path/to/emacs-fastframe/")
+;;  (add-to-list 'load-path "/path/to/emacs-fastframe")
 ;;  (require 'fastframe)
 ;;  (fastframe-activate)
 
