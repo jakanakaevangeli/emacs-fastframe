@@ -68,12 +68,15 @@ amount of idle time."
   :type 'number)
 
 (defvar fastframe-static-parameters
-  '(display display-type name minibuffer window-id outer-window-id
-            font-backend)
+  '(display-type name minibuffer window-id outer-window-id
+                 font-backend)
   "List of frame parameters that cannot be changed.
 Fastframe will not try to change these parameters of frames in
 the pool. It will instead choose a frame that was created with
-these parameters if it exist.")
+these parameters if it exist.
+
+Adding 'display to this list has no special effect as that
+property is handled specially.")
 
 (defvar fastframe--pool nil
   "Alist of invisible frames.
@@ -95,16 +98,32 @@ Like `x-create-frame-with-faces', but tries to reuse existing
 invisible frames from `fastframe--pool' with matching
 PARAMETERS."
   (let* ((static-params fastframe-static-parameters)
-         stripped-params as frame
+         stripped-params as frame display
          specified-visibility specified-no-other-frame)
     (dolist (param parameters)
       (let ((param-name (car param)))
-        (when (memq param-name static-params)
-          (push param stripped-params))
+        ;; Special casing for (display . nil) which is usually equivalent to
+        ;; (display . ":1")
+        (cond ((eq param-name 'display)
+               (or display (setq display (cdr param))))
+              ((memq param-name static-params)
+               (push param stripped-params)))
         (cond ((eq param-name 'visibility)
                (setq specified-visibility t))
               ((eq param-name 'no-other-frame)
                (setq specified-no-other-frame t)))))
+    (push (cons 'display (cond
+                          ;; Basically a re-implementation of
+                          ;; check_x_display_info from src/xfns.c
+                          ((null display)
+                           (let ((sel (selected-frame)))
+                             (if (and (frame-live-p sel)
+                                      (display-graphic-p sel))
+                                 (terminal-name sel)
+                               (car (last (x-display-list))))))
+                          ((stringp display) display)
+                          (t (terminal-name display))))
+          stripped-params)
 
     (if (setq as (assoc stripped-params fastframe--pool))
         (while (and (null frame) (cadr as))
