@@ -39,6 +39,14 @@
 ;;  (add-to-list 'load-path "/path/to/emacs-fastframe")
 ;;  (require 'fastframe)
 ;;  (fastframe-activate)
+;;
+;; Notes:
+;;
+;; - The frame pool is only used for creation of graphical frames, creation of
+;;   tty frames is unaffected.
+;; - Doesn't work well if using multiple GUI display servers/terminals at once
+;; - I see this as a temporary kludge until
+;;   https://debbugs.gnu.org/cgi/bugreport.cgi?bug=41200 is fixed
 
 ;;; Code:
 
