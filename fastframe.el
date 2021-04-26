@@ -86,6 +86,9 @@ for the cars.")
 
 (defvar fastframe--timer nil)
 
+(defvar fastframe--buffer nil
+  "Buffer displayed on invisible frames.")
+
 (defun fastframe-x-create-frame-with-faces (parameters)
   "Create and return a frame with frame parameters PARAMETERS.
 Like `x-create-frame-with-faces', but tries to reuse existing
@@ -176,8 +179,21 @@ Do nothing and return nil if it corresponds to ASSOC from
 Use PARAMS as the frame's parameters. Increase
 `fastframe--pool-current-count'."
   (when (memq window-system '(x w32 ns))
-    (let* ((frame (x-create-frame-with-faces
-                   `((no-other-frame . t) (visibility . nil) ,@params))))
+    (let ((buffer fastframe--buffer)
+          (frame nil))
+      (unless buffer
+        (setq buffer (setq fastframe--buffer
+                           (generate-new-buffer " *fastframe*"))))
+      (with-current-buffer buffer
+        (unwind-protect
+            (progn
+              ;; `x-create-frame' displays the current buffer on newly created
+              ;; frame if its name doesn't begin with a space
+              (rename-buffer "*fastframe*" t)
+              (setq frame
+                    (x-create-frame-with-faces
+                     `((no-other-frame . t) (visibility . nil) ,@params))))
+          (rename-buffer " *fastframe*" t)))
       (let ((inhibit-quit t))
         (push frame (cdr assoc))
         (setq fastframe--pool-current-count
