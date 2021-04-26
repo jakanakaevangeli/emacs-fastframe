@@ -181,7 +181,7 @@ Use PARAMS as the frame's parameters. Increase
   (when (memq window-system '(x w32 ns))
     (let ((buffer fastframe--buffer)
           (frame nil))
-      (unless buffer
+      (unless (buffer-live-p buffer)
         (setq buffer (setq fastframe--buffer
                            (generate-new-buffer " *fastframe*"))))
       (with-current-buffer buffer
