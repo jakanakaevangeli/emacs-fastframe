@@ -114,6 +114,9 @@ PARAMETERS."
                   (1- fastframe--pool-current-count)))
           (if (frame-live-p frame)
               (progn
+                (let ((window (frame-root-window frame)))
+                  (set-window-buffer window (current-buffer))
+                  (set-window-prev-buffers window nil))
                 (unless specified-visibility
                   (setq parameters (cons '(visibility . t) parameters)))
                 (unless specified-no-other-frame
