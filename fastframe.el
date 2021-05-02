@@ -129,7 +129,7 @@ PARAMETERS."
       (setq as (list stripped-params))
       (push as fastframe--pool))
     (prog1 (or frame (x-create-frame-with-faces parameters))
-      (fastframe--setup-timer as parameters))))
+      (fastframe--setup-timer as stripped-params))))
 
 (defun fastframe--setup-timer (assoc params)
   "Set up a timer to start making frames for the pool.
