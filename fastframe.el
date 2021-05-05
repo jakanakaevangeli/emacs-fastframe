@@ -44,7 +44,6 @@
 ;;
 ;; - The frame pool is only used for creation of graphical frames, creation of
 ;;   tty frames is unaffected.
-;; - Doesn't work well if using multiple GUI display servers/terminals at once
 ;; - I see this as a temporary kludge until
 ;;   https://debbugs.gnu.org/cgi/bugreport.cgi?bug=41200 is fixed
 
@@ -68,8 +67,7 @@ amount of idle time."
   :type 'number)
 
 (defvar fastframe-static-parameters
-  '(display-type name minibuffer window-id outer-window-id
-                 font-backend)
+  '(display-type name minibuffer window-id outer-window-id font-backend)
   "List of frame parameters that cannot be changed.
 Fastframe will not try to change these parameters of frames in
 the pool. It will instead choose a frame that was created with
