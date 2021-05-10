@@ -97,7 +97,8 @@ invisible frames from `fastframe--pool' with matching
 PARAMETERS."
   (let* ((static-params fastframe-static-parameters)
          stripped-params as frame display
-         specified-visibility specified-no-other-frame)
+         specified-visibility specified-no-other-frame
+         specified-desktop-dont-save)
     (dolist (param parameters)
       (let ((param-name (car param)))
         ;; Special casing for (display . nil) which is usually equivalent to
@@ -109,7 +110,9 @@ PARAMETERS."
         (cond ((eq param-name 'visibility)
                (setq specified-visibility t))
               ((eq param-name 'no-other-frame)
-               (setq specified-no-other-frame t)))))
+               (setq specified-no-other-frame t))
+              ((eq param-name 'desktop-dont-save)
+               (setq specified-desktop-dont-save t)))))
     (push (cons 'display (cond
                           ;; Basically a re-implementation of
                           ;; check_x_display_info from src/xfns.c
@@ -141,6 +144,8 @@ PARAMETERS."
                   (setq parameters (cons '(visibility . t) parameters)))
                 (unless specified-no-other-frame
                   (setq parameters (cons '(no-other-frame . nil) parameters)))
+                (unless specified-desktop-dont-save
+                  (setq parameters (cons '(desktop-dont-save . nil) parameters)))
                 (modify-frame-parameters frame parameters))
             (setq frame nil)))
       (setq as (list stripped-params))
@@ -215,7 +220,8 @@ Use PARAMS as the frame's parameters. Increase
               (rename-buffer "*fastframe*" t)
               (setq frame
                     (x-create-frame-with-faces
-                     `((no-other-frame . t) (visibility . nil) ,@params))))
+                     `((no-other-frame . t) (visibility . nil)
+                       (desktop-dont-save . t) ,@params))))
           (rename-buffer " *fastframe*" t)))
       (let ((inhibit-quit t))
         (push frame (cdr assoc))
