@@ -7,7 +7,7 @@ a pre-made frame will be made visible from the pool and returned.
 
 Installation:
 
-Add the following to you Emacs init file:
+Add the following to your Emacs init file:
 
  (add-to-list 'load-path "/path/to/emacs-fastframe")
  (require 'fastframe)
