@@ -27,10 +27,15 @@
 
 ;; A simple tool to mitigate make-frame performance issues.
 ;;
-;; Graphical frame creation can get very slow when a lot of faces are defined.
-;; Fastframe can help mitigate this by creating a pool of invisible frames
-;; during idle time. When a frame is requested with `frame-creation-function',
-;; a pre-made frame will be made visible from the pool and returned.
+;; For Emacs versions 27.2 or lover, graphical frame creation can get very slow
+;; when a lot of faces are defined. Fastframe can help mitigate this by
+;; pre-creating a pool of invisible frames during idle time. It sets up Emacs
+;; such that when it would normally create a new frame, it would instead choose
+;; an existing frame from this frame pool and make it visible.
+;;
+;; This package is not needed for Emacs versions 28 or higher, because the
+;; frame creation performance issue was fixed. This bug is tracked in
+;; https://debbugs.gnu.org/cgi/bugreport.cgi?bug=41200
 ;;
 ;; Installation:
 ;;
@@ -44,8 +49,6 @@
 ;;
 ;; - The frame pool is only used for creation of graphical frames, creation of
 ;;   tty frames is unaffected.
-;; - I see this as a temporary kludge until
-;;   https://debbugs.gnu.org/cgi/bugreport.cgi?bug=41200 is fixed
 
 ;;; Code:
 
